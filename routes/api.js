@@ -49,10 +49,19 @@ module.exports = function (app) {
   Project = mongoose.model('Project', projectSchema);
   Issue = mongoose.model('Issue', issueSchema);
 
+  const acceptableGetQueries = ['issue_title', 'issue_text', 'created_by', 'assigned_to', 'open', 'status_text'];
+
   app.route('/api/issues/:project')
   
     .get(function (req, res){
       let project = req.params.project;
+      let queries = req.query;
+
+      for(let key in queries) {
+        if(!acceptableGetQueries.find(i => i === key)) {
+          delete queries[key];
+        }
+      }
       
       Project.findOne({name: project})
       .populate({path: "issues"})
@@ -61,7 +70,10 @@ module.exports = function (app) {
             res.json(err1);
             return;
           }
-          let existingIssues = existing.issues.map(issue => {
+          let existingIssues = existing.issues
+            .filter(issue => Object.entries(queries)
+            .every(([key,query]) => issue[key].toString().toLowerCase().includes(query.toLowerCase())))
+            .map(issue => {
             return {
               "_id": issue._id,
               "issue_title": issue.issue_title,
@@ -92,9 +104,9 @@ module.exports = function (app) {
         let newIssue = Issue({
           issue_title: req.body.issue_title,
           issue_text: req.body.issue_text,
-          created_by: req.body.created_by,
-          assigned_to: req.body.assigned_to,
-          status_text: req.body.status_text
+          created_by: req.body.created_by || "",
+          assigned_to: req.body.assigned_to || "",
+          status_text: req.body.status_text || ""
         });
 
         newIssue.save(function(err2, savedIssue) {
