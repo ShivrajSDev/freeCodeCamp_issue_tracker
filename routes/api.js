@@ -157,11 +157,11 @@ module.exports = function (app) {
           } else {
             let updatedParams = {
               updated_on: new Date(),
-              issue_title: req.body.issue_title.trim() || undefined,
-              issue_text: req.body.issue_text.trim() || undefined,
-              created_by: req.body.created_by.trim() || undefined,
-              assigned_to: req.body.assigned_to.trim() || undefined,
-              status_text: req.body.status_text.trim() || undefined,
+              issue_title: req.body.issue_title?.trim() || undefined,
+              issue_text: req.body.issue_text?.trim() || undefined,
+              created_by: req.body.created_by?.trim() || undefined,
+              assigned_to: req.body.assigned_to?.trim() || undefined,
+              status_text: req.body.status_text?.trim() || undefined,
               open: req.body.open || true
             }
             for(let key in updatedParams) {
