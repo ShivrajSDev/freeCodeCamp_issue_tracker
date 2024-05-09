@@ -93,6 +93,11 @@ module.exports = function (app) {
     
     .post(function (req, res){
       let project = req.params.project;
+
+      if(!req.body.issue_title || ! req.body.issue_text || !req.body.created_by) {
+        res.json({error: 'required field(s) missing'});
+        return;
+      }
       
       let saveOptions = { upsert: true, new: true, setDefaultsOnInsert: true };
       Project.findOneAndUpdate({name: project}, {}, saveOptions, function(err1, existingProject) {
@@ -104,7 +109,7 @@ module.exports = function (app) {
         let newIssue = Issue({
           issue_title: req.body.issue_title,
           issue_text: req.body.issue_text,
-          created_by: req.body.created_by || "",
+          created_by: req.body.created_by,
           assigned_to: req.body.assigned_to || "",
           status_text: req.body.status_text || ""
         });
@@ -139,8 +144,20 @@ module.exports = function (app) {
     .put(function (req, res){
       let project = req.params.project;
 
+      if(!req.body._id) {
+        res.json({error: 'missing _id'});
+        return;
+      }
+
+      const {_id, ...updateParams } = req.body;
+
+      if(Object.values(updateParams).every(i => i.length === 0)) {
+        res.json({error: 'no update field(s) sent', _id: req.body._id});
+        return;
+      }
+
       Project.findOne({name: project})
-      .populate({path: "issues"})
+        .populate({path: "issues"})
         .exec((err1, existing) => {
           if(err1) {
             res.json(err1);
@@ -182,6 +199,11 @@ module.exports = function (app) {
     
     .delete(function (req, res){
       let project = req.params.project;
+
+      if(!req.body._id) {
+        res.json({error: 'missing _id'});
+        return;
+      }
       
       Project.findOne({name: project})
       .populate({path: "issues"})

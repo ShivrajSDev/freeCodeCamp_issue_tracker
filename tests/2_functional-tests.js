@@ -72,13 +72,14 @@ suite('Functional Tests', function() {
             .post(`/api/issues/${testProjectName}`)
             .end(function(err, res) {
                 assert.equal(res.status, 200);
-                assert.exists(res.body.errors);
-                assert.exists(res.body.errors.issue_title);
+                assert.exists(res.body.error);
+                assert.equal(res.body.error, 'required field(s) missing');
+                /*assert.exists(res.body.errors.issue_title);
                 assert.exists(res.body.errors.issue_text);
                 assert.exists(res.body.errors.created_by);
                 assert.include(res.body.message, '`issue_title` is required');
                 assert.include(res.body.message, '`issue_text` is required');
-                assert.include(res.body.message, '`created_by` is required');
+                assert.include(res.body.message, '`created_by` is required');*/
                 done();
             });
     });
@@ -165,7 +166,7 @@ suite('Functional Tests', function() {
     });
 
     //Update an issue with missing _id: PUT request to /api/issues/{project}
-    test("Update multiple fields on an issue", function(done) {
+    test("Update an issue with missing _id", function(done) {
         chai.request(server)
             .keepOpen()
             .put(`/api/issues/${testProjectName}`)
@@ -173,7 +174,7 @@ suite('Functional Tests', function() {
             .end(function(err, res) {
                 assert.equal(res.status, 200);
                 assert.exists(res.body.error);
-                assert.equal(res.body.error, 'could not update');
+                assert.equal(res.body.error, 'missing _id');
 
                 done();
             });
@@ -187,9 +188,8 @@ suite('Functional Tests', function() {
             .send({ _id: newIssueID})
             .end(function(err, res) {
                 assert.equal(res.status, 200);
-                assert.notExists(res.body.errors);
-                assert.exists(res.body.result);
-                assert.equal(res.body.result, 'successfully updated');
+                assert.exists(res.body.error);
+                assert.equal(res.body.error, 'no update field(s) sent');
                 assert.exists(res.body._id);
                 assert.equal(res.body._id, newIssueID);
 
@@ -198,15 +198,17 @@ suite('Functional Tests', function() {
     });
 
     //Update an issue with an invalid _id: PUT request to /api/issues/{project}
-    test("Update an issue with no fields to update", function(done) {
+    test("Update an issue with an invalid _id", function(done) {
         chai.request(server)
             .keepOpen()
             .put(`/api/issues/${testProjectName}`)
-            .send({ _id: 'invalid'})
+            .send({ _id: 'invalid', issue_title: 'Updating title'})
             .end(function(err, res) {
                 assert.equal(res.status, 200);
                 assert.exists(res.body.error);
                 assert.equal(res.body.error, 'could not update');
+                assert.exists(res.body._id);
+                assert.equal(res.body._id, 'invalid');
 
                 done();
             });
@@ -240,6 +242,8 @@ suite('Functional Tests', function() {
                 assert.equal(res.status, 200);
                 assert.exists(res.body.error);
                 assert.equal(res.body.error, 'could not delete');
+                assert.exists(res.body._id);
+                assert.equal(res.body._id, 'invalid');
 
                 done();
             });
@@ -253,7 +257,7 @@ suite('Functional Tests', function() {
             .end(function(err, res) {
                 assert.equal(res.status, 200);
                 assert.exists(res.body.error);
-                assert.equal(res.body.error, 'could not delete');
+                assert.equal(res.body.error, 'missing _id');
 
                 done();
             });
