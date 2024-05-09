@@ -49,7 +49,7 @@ module.exports = function (app) {
   Project = mongoose.model('Project', projectSchema);
   Issue = mongoose.model('Issue', issueSchema);
 
-  const acceptableGetQueries = ['issue_title', 'issue_text', 'created_by', 'assigned_to', 'open', 'status_text'];
+  const acceptableGetQueries = ['_id', 'issue_title', 'issue_text', 'created_by', 'assigned_to', 'open', 'status_text'];
 
   app.route('/api/issues/:project')
   

@@ -93,7 +93,9 @@ suite('Functional Tests', function() {
                 assert.equal(res.status, 200);
                 assert.notExists(res.body.errors);
                 assert.isArray(res.body);
-                assert.isAtLeast(res.body.length, 1);
+                // Check if new issue exists
+                const newIssue = res.body.find(i => i._id);
+                assert.exists(newIssue);
 
                 done();
             });
@@ -108,7 +110,9 @@ suite('Functional Tests', function() {
                 assert.equal(res.status, 200);
                 assert.notExists(res.body.errors);
                 assert.isArray(res.body);
-                assert.isAtLeast(res.body.length, 1);
+                // Check if new issue exists
+                const newIssue = res.body.find(i => i._id);
+                assert.exists(newIssue);
 
                 done();
             });
@@ -123,7 +127,9 @@ suite('Functional Tests', function() {
                 assert.equal(res.status, 200);
                 assert.notExists(res.body.errors);
                 assert.isArray(res.body);
-                assert.isAtLeast(res.body.length, 1);
+                // Check if new issue exists
+                const newIssue = res.body.find(i => i._id);
+                assert.exists(newIssue);
 
                 done();
             });
